@@ -5,7 +5,7 @@
 APP="RPMBuilder"
 
 # Utility version (String)
-VER="2.4.2"
+VER="2.5.0"
 
 ####################################################################
 
@@ -55,6 +55,9 @@ INSPEC_ARG_PREFIX="rpmbuilder:"
 
 # User Agent used for all HTTP requests (String)
 USER_AGENT="$APP/$VER"
+
+# Name of file with sources checksums
+CHECKSUM_FILE="checksum.sha512"
 
 SEPARATOR="----------------------------------------------------------------------------------------"
 
@@ -381,7 +384,7 @@ usage() {
   showo "--git" "Fetch sources from Git repository" "url"
   showo "--svn" "Fetch sources from SVN repository" "url"
   showo "--hg" "Fetch sources from Mercurial repository" "url"
-  showo "--bzr" "Fetch sources from Bazar repository" "url"
+  showo "--bzr" "Fetch sources from Bazaar repository" "url"
   showo "--path, -rp" "Path to a directory with sources in repository" "path"
   showo "--branch, -rb" "Use specified repository branch" "branch"
   showo "--revision, -rr" "Use specified revision" "rev"
@@ -513,7 +516,7 @@ if [[ -n "$PREFS_FILE" && -r "$PREFS_FILE" ]] ; then
   unset arg argn argp
 fi
 
-## OPTIONS PARSING 4 ###################################################################
+## ARGUMENTS PARSING 4 #################################################################
 
 [[ $# -eq 0 ]] && main && exit $?
 
@@ -574,13 +577,16 @@ while [[ -n "$1" ]] ; do
 
       unset argm && shift && continue
     else
+      # shellcheck disable=SC2178
       arg=${arg//-/_}
 
       if [[ -z "$argn" ]] ; then
+        # shellcheck disable=SC2128
         argn=$arg
       else
         # shellcheck disable=SC2015
         [[ -z "$argk" ]] && ( declare -F showArgValWarn &>/dev/null && showArgValWarn "--$argn" ) || declare "$argn=true"
+        # shellcheck disable=SC2128
         argn=$arg
       fi
 
