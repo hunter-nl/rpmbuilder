@@ -52,8 +52,8 @@
 Summary:         Configuration package for rpmbuilder node
 Name:            rpmbuilder-node
 Version:         1.4.1
-Release:         0%{?dist}
-License:         EKOL
+Release:         3%{?dist}
+License:         Apache License, Version 2.0
 Group:           Development/Tools
 URL:             https://github.com/essentialkaos/rpmbuilder
 
@@ -98,9 +98,15 @@ install -pm 755 nodeinfo %{buildroot}%{home_dir}/
 install -pm 755 initenv %{buildroot}%{home_dir}/
 install -pm 644 rpmlint %{buildroot}%{home_dir}/.config/
 
-%if 0%{?rhel} >= 7
+%if 0%{?rhel} == 8
+install -pm 755 rpmmacros_centos8 %{buildroot}%{home_dir}/.rpmmacros_rpmbuilder
+%endif
+
+%if 0%{?rhel} == 7
 install -pm 755 rpmmacros_centos7 %{buildroot}%{home_dir}/.rpmmacros_rpmbuilder
-%else
+%endif
+
+%if 0%{?rhel} == 6
 install -pm 755 rpmmacros_centos6 %{buildroot}%{home_dir}/.rpmmacros_rpmbuilder
 %endif
 
@@ -114,10 +120,12 @@ getent group %{user_name} >/dev/null || groupadd -r %{user_name}
 getent passwd %{user_name} >/dev/null || useradd -r -g %{user_name} -d %{_home}/%{user_name} -s /bin/bash %{user_name}
 
 %post
-chown %{user_name}:%{user_name} %{home_dir} -R
+chown -h -R %{user_name}:%{user_name} %{home_dir}
 
 if [[ $1 -eq 1 ]] ; then
   touch %{home_dir}/.ssh/authorized_keys
+
+  # perfecto:absolve
   chmod 0600 %{home_dir}/.ssh/authorized_keys
 
   sudo -u %{user_name} rpmdev-setuptree
@@ -128,7 +136,7 @@ if [[ $1 -eq 1 ]] ; then
   %{__service} %{service_name} start &> /dev/null || :
   %{__chkconfig} --add %{service_name}
 
-  chown %{user_name}:%{user_name} %{home_dir} -R
+  chown -h -R %{user_name}:%{user_name} %{home_dir}
 
   # Enable password authentication for build node
   sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' %{_sysconfdir}/ssh/sshd_config
@@ -164,6 +172,15 @@ fi
 ################################################################################
 
 %changelog
+* Fri May 29 2020 Anton Novojilov <andy@essentialkaos.com> - 1.4.1-3
+- Fixed problems reported by perfecto
+
+* Mon Dec 16 2019 Anton Novojilov <andy@essentialkaos.com> - 1.4.1-2
+- Added threads usage for payload packing to rpmmacros files
+
+* Sat Nov 30 2019 Anton Novojilov <andy@essentialkaos.com> - 1.4.1-1
+- Added rpmmacros file for CentOS 8
+
 * Fri Jan 04 2019 Anton Novojilov <andy@essentialkaos.com> - 1.4.1-0
 - Code refactoring
 

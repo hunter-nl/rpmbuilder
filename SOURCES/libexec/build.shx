@@ -36,7 +36,7 @@ startBuild() {
 
   trap termExit SIGINT SIGQUIT SIGTERM
 
-  if [[ -n "$parallel" && $(wc -l "${remote/:*/}" | cut -f1 -d" ") -gt 1 ]] ; then
+  if [[ -z "$download" && -n "$parallel" && $(wc -l "${remote/:*/}" | cut -f1 -d" ") -gt 1 ]] ; then
     if [[ "${remote/:*/}" != "$remote" ]] ; then
       basicBuild "$@"
     else
@@ -60,6 +60,10 @@ basicBuild() {
   start_ts=$(now)
 
   [[ -n "$tmux_worker" ]] && createWorkerLock
+
+  if [[ "$download" == "true" ]] ; then
+    download=$(findSourcesDir)
+  fi
 
   [[ -n "$dest" ]]     && dest_dir="$dest"
   [[ -n "$dest_dir" ]] && dest_dir=$(getAbsPath "$dest_dir")
@@ -458,10 +462,9 @@ getYumOpts() {
 # Convert utility options to rpmbuild options
 #
 # Code: No
-# Echo: No
+# Echo: Options (String)
 getBuildOpts() {
   local opts=""
-  local macros_def
 
   if [[ -n "$no_source" ]] ; then
     opts="-bb"
@@ -480,12 +483,26 @@ getBuildOpts() {
   [[ -n "$verbose" ]] && opts="$opts --verbose"
 
   if [[ -n "$define" ]] ; then
-    for macros_def in $define ; do
-      opts="$opts --define=\"${macros_def/=/ }\""
-    done
+    opts="$opts $(getDefineOpts)"
   fi
 
   echo "$opts"
+}
+
+# Get options with macro definitions
+#
+# Code: No
+# Echo: Options (String)
+getDefineOpts() {
+  local opts macros_def
+
+  if [[ -n "$define" ]] ; then
+    for macros_def in $define ; do
+      opts="--define=\"${macros_def/=/ }\" ${opts}"
+    done
+  fi
+
+  echo "${opts% }"
 }
 
 # Get build prefix

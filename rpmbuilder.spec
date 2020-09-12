@@ -2,11 +2,11 @@
 
 Summary:         RPM package build helper
 Name:            rpmbuilder
-Version:         2.5.0
+Version:         2.8.0
 Release:         0%{?dist}
-License:         EKOL
+License:         Apache License, Version 2.0
 Group:           Development/Tools
-URL:             https://github.com/essentialkaos/rpmbuilder
+URL:             https://kaos.sh/rpmbuilder
 
 Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
@@ -55,6 +55,36 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Thu May 14 2020 Anton Novojilov <andy@essentialkaos.com> - 2.8.0-0
+- Speeded up fetching data from git repositories
+- Show info about packaged sources size
+- Automatic directory search for downloads
+
+* Wed Mar 25 2020 Anton Novojilov <andy@essentialkaos.com> - 2.7.3-0
+- Use /var/tmp instead of /tmp for storing temporary data
+
+* Tue Mar 10 2020 Anton Novojilov <andy@essentialkaos.com> - 2.7.2-0
+- Fixed bug with handling macroses defined through --define option while
+  downloading sources and patches
+
+* Wed Feb 05 2020 Anton Novojilov <andy@essentialkaos.com> - 2.7.1-0
+- Fixed handling --download option with predefined options in preferences file
+
+* Tue Feb 04 2020 Anton Novojilov <andy@essentialkaos.com> - 2.7.0-0
+- Updated options parser to the latest version
+- Improved preferences parser
+- Refactoring
+
+* Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 2.6.0-0
+- Added validation for downloaded files
+
+* Wed Dec 04 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.2-0
+- Removed handler for script errors
+
+* Sat Nov 30 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.1-0
+- Added handling of SCRIPT_DEBUG environment variable for enabling debug mode
+- Added handler for script errors
+
 * Thu Aug 08 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
 - Automatic SHA-512 CRC generation feature
 
